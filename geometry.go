@@ -22,8 +22,8 @@ const (
 
 // A Geometry correlates to a GeoJSON geometry object.
 type Geometry struct {
-	Type            GeometryType `json:"type"`
-	BoundingBox     []float64    `json:"bbox,omitempty"`
+	Type            GeometryType `json:"type" bson:"type"`
+	BoundingBox     []float64    `json:"bbox,omitempty" bson:"bbox,omitempty"`
 	Point           []float64
 	MultiPoint      [][]float64
 	LineString      [][]float64
@@ -31,7 +31,7 @@ type Geometry struct {
 	Polygon         [][][]float64
 	MultiPolygon    [][][][]float64
 	Geometries      []*Geometry
-	CRS             map[string]interface{} `json:"crs,omitempty"` // Coordinate Reference System Objects are not currently supported
+	CRS             map[string]interface{} `json:"crs,omitempty" bson:"crs,omitempty"` // Coordinate Reference System Objects are not currently supported
 }
 
 // NewPointGeometry creates and initializes a point geometry with the give coordinate.
@@ -191,21 +191,40 @@ func decodeGeometry(g *Geometry, object map[string]interface{}) error {
 	}
 	g.BoundingBox = bb
 
-	switch g.Type {
-	case GeometryPoint:
-		g.Point, err = decodePosition(object["coordinates"])
-	case GeometryMultiPoint:
-		g.MultiPoint, err = decodePositionSet(object["coordinates"])
-	case GeometryLineString:
-		g.LineString, err = decodePositionSet(object["coordinates"])
-	case GeometryMultiLineString:
-		g.MultiLineString, err = decodePathSet(object["coordinates"])
-	case GeometryPolygon:
-		g.Polygon, err = decodePathSet(object["coordinates"])
-	case GeometryMultiPolygon:
-		g.MultiPolygon, err = decodePolygonSet(object["coordinates"])
-	case GeometryCollection:
-		g.Geometries, err = decodeGeometries(object["geometries"])
+	if coordinates, ok := object["coordinates"]; ok {
+		switch g.Type {
+		case GeometryPoint:
+			g.Point, err = decodePosition(coordinates)
+		case GeometryMultiPoint:
+			g.MultiPoint, err = decodePositionSet(coordinates)
+		case GeometryLineString:
+			g.LineString, err = decodePositionSet(coordinates)
+		case GeometryMultiLineString:
+			g.MultiLineString, err = decodePathSet(coordinates)
+		case GeometryPolygon:
+			g.Polygon, err = decodePathSet(coordinates)
+		case GeometryMultiPolygon:
+			g.MultiPolygon, err = decodePolygonSet(coordinates)
+		case GeometryCollection:
+			g.Geometries, err = decodeGeometries(coordinates)
+		}
+	} else {
+		switch g.Type {
+		case GeometryPoint:
+			g.Point, err = decodePosition(object["point"])
+		case GeometryMultiPoint:
+			g.MultiPoint, err = decodePositionSet(object["multipoint"])
+		case GeometryLineString:
+			g.LineString, err = decodePositionSet(object["linestring"])
+		case GeometryMultiLineString:
+			g.MultiLineString, err = decodePathSet(object["multilinestring"])
+		case GeometryPolygon:
+			g.Polygon, err = decodePathSet(object["polygon"])
+		case GeometryMultiPolygon:
+			g.MultiPolygon, err = decodePolygonSet(object["multipolygon"])
+		case GeometryCollection:
+			g.Geometries, err = decodeGeometries(object["geometries"])
+		}
 	}
 
 	return err

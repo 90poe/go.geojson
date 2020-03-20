@@ -11,10 +11,10 @@ import (
 
 // A FeatureCollection correlates to a GeoJSON feature collection.
 type FeatureCollection struct {
-	Type        string                 `json:"type"`
-	BoundingBox []float64              `json:"bbox,omitempty"`
-	Features    []*Feature             `json:"features"`
-	CRS         map[string]interface{} `json:"crs,omitempty"` // Coordinate Reference System Objects are not currently supported
+	Type        string                 `json:"type" bson:"type"`
+	BoundingBox []float64              `json:"bbox,omitempty" bson:"bbox,omitempty"`
+	Features    []*Feature             `json:"features" bson:"features"`
+	CRS         map[string]interface{} `json:"crs,omitempty" bson:"crs,omitempty"` // Coordinate Reference System Objects are not currently supported
 }
 
 // NewFeatureCollection creates and initializes a new feature collection.

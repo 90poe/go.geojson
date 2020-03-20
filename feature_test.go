@@ -79,6 +79,55 @@ func TestUnmarshalFeature(t *testing.T) {
 	}
 }
 
+func TestUnmarshalFeature2(t *testing.T) {
+	rawJSON := `{
+		"id": "6cdeb425-0b80-442c-a806-632a8130087d",
+		"type": "Feature",
+		"bbox": [1, 2, 3, 4],
+		"geometry": {
+			"type": "Polygon",
+			"boundingbox": [],
+			"point": [],
+			"multipoint": [],
+			"linestring": [],
+			"multilinestring": [],
+			"polygon": [
+				[
+					[65.0, 22.0],
+					[58.0, 22.0],
+					[45.0, 15.0],
+					[39.0, 15.0],
+					[39.0, -5.0],
+					[65.0, -5.0],
+					[65.0, 22.0]
+				]
+			],
+			"multipolygon": [],
+			"geometries": [],
+			"crs": {}
+		},
+		"properties": {"public_zone": true},
+		"crs": {}
+	}`
+
+	f, err := UnmarshalFeature([]byte(rawJSON))
+	if err != nil {
+		t.Fatalf("should unmarshal feature without issue, err %v", err)
+	}
+
+	if f.Type != "Feature" {
+		t.Errorf("should have type of Feature, got %v", f.Type)
+	}
+
+	if len(f.Properties) != 1 {
+		t.Errorf("should have 1 property but got %d", len(f.Properties))
+	}
+
+	if len(f.BoundingBox) != 4 {
+		t.Errorf("should have unmarshalled bounding box")
+	}
+}
+
 func TestMarshalFeatureID(t *testing.T) {
 	f := &Feature{
 		ID: "asdf",
