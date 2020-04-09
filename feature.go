@@ -6,7 +6,7 @@ import (
 
 // A Feature corresponds to GeoJSON feature object
 type Feature struct {
-	ID          interface{}            `json:"id,omitempty" bson:"id,omitempty"`
+	ID          interface{}            `json:"id,omitempty" bson:"_id,omitempty"`
 	Type        string                 `json:"type" bson:"type"`
 	BoundingBox []float64              `json:"bbox,omitempty" bson:"bbox,omitempty"`
 	Geometry    *Geometry              `json:"geometry" bson:"geometry"`
